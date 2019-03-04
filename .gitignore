@@ -22,6 +22,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+#oldfiles
 /src/components/CanvasBoard.js
 /src/components/LineDrawer.js
 /src/components/LineDrawer2.js
