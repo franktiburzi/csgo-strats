@@ -21,8 +21,8 @@ export class CanvasLineDrawer extends React.Component {
 
     //helper method to clear the currentStroke object
     resetCurrentStroke() {
-        this.currentStroke.start = [];
-        this.currentStroke.points = [];
+        this.currentStroke['start'] = [];
+        this.currentStroke['points'] = [];
     }
 
     /* set up the canvas when it mounts by setting size*/
@@ -43,6 +43,7 @@ export class CanvasLineDrawer extends React.Component {
     *  that the mouse is pressed so we can listen for mouse movements
     */
     handleMouseDown(e) {
+        console.log(this.state.strokes);
         this.setState({
             mousePressed: true
         })
@@ -72,10 +73,13 @@ export class CanvasLineDrawer extends React.Component {
 
     /* Stop drawing when mouse is released*/
     handleMouseUp() {
-        this.setState({
-            mousePressed: false,
-            strokes: [...this.state.strokes, this.currentStroke]
-        });
+        this.setState(
+            prevState => ({
+                mousePressed: false,
+                strokes: [...prevState.strokes, this.currentStroke]
+            }),
+            () => this.resetCurrentStroke()
+        );
     }
 
     render() {
