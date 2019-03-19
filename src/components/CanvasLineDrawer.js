@@ -3,26 +3,18 @@ import React from 'react';
 export class CanvasLineDrawer extends React.Component {
     constructor(props) {
         super(props);
-        this.currentStroke = {
-            start: [],
-            points: []
-        }; 
         this.state = {
             canvas: null,
             context: null,
             mousePressed: false,
-            strokes: []
+            strokes: [],
+            tempStart: [],
+            tempPoints: []
         };
         this.canvasRef = React.createRef();
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
-    }
-
-    //helper method to clear the currentStroke object
-    resetCurrentStroke() {
-        this.currentStroke['start'] = [];
-        this.currentStroke['points'] = [];
     }
 
     /* set up the canvas when it mounts by setting size*/
@@ -43,17 +35,16 @@ export class CanvasLineDrawer extends React.Component {
     *  that the mouse is pressed so we can listen for mouse movements
     */
     handleMouseDown(e) {
-        console.log(this.state.strokes);
-        this.setState({
-            mousePressed: true
-        })
+        //console.log(this.state.strokes);
         let rect = this.state.canvas.getBoundingClientRect()
         let xCord = e.clientX - rect.left;
         let yCord = e.clientY - rect.top;
         this.state.context.beginPath();
         this.state.context.moveTo(xCord, yCord);
-        //add starting point to the currentStroke
-        this.currentStroke.start = this.currentStroke.start.concat(xCord,yCord);
+        this.setState({
+            tempStart: [xCord, yCord],
+            mousePressed: true
+        });
     }
 
     /* Draw to the canvas on mouse movement
@@ -66,20 +57,18 @@ export class CanvasLineDrawer extends React.Component {
             let yCord = e.clientY - rect.top;
             this.state.context.lineTo(xCord, yCord);
             this.state.context.stroke();
-            //add point we just drew to currentStroke
-            this.currentStroke.points.push([xCord,yCord]);
+            this.setState(prevState =>({
+                tempPoints: [...prevState.tempPoints, [xCord, yCord]] 
+            }));
         }
     }
 
     /* Stop drawing when mouse is released*/
     handleMouseUp() {
-        this.setState(
-            prevState => ({
-                mousePressed: false,
-                strokes: [...prevState.strokes, this.currentStroke]
-            }),
-            () => this.resetCurrentStroke()
-        );
+        this.setState(prevState => ({
+                strokes: [...prevState.strokes, {start: prevState.tempStart, points: prevState.tempPoints}],
+                mousePressed: false
+        }));
     }
 
     render() {
