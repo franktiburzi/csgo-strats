@@ -29,7 +29,7 @@ export class App extends Component {
             <button onClick={() => this.setMode('lineDrawer')}>
                 draw lines
             </button>
-            <button onClick={() => this.setMode('lineDrawer2')}>
+            <button onClick={() => this.setMode('shapeDragger')}>
                 draw lines 2
             </button>
         </div>
