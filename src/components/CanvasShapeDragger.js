@@ -12,6 +12,7 @@ export class CanvasShapeDragger extends React.Component {
         this.currentUtility = [];
         this.canvasRef = React.createRef();
         this.handleMouseDown = this.handleMouseDown.bind(this);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
     }
 
     /* set up the canvas when it mounts by setting size*/
@@ -58,23 +59,37 @@ export class CanvasShapeDragger extends React.Component {
                 topLeft: topLeft,
                 topRight: topRight,
                 bottomLeft: bottomLeft,
-                bottomRight: bottomRight
+                bottomRight: bottomRight,
             });
         }.bind(this);
     }
 
+    /* When the mouse is pressed check if we have clicked into a utility object*/
     handleMouseDown(e) {
         let rect = this.state.canvas.getBoundingClientRect()
         let xCord = e.clientX - rect.left-3;
         let yCord = e.clientY - rect.top-3;
+        //loop through all utility looking if we are inside
         for (let i = 0; i < this.currentUtility.length; i++) {
-            console.log(this.currentUtility[i].bottomLeft);
-            console.log(this.currentUtility[i].topRight);
-            console.log([xCord,yCord]);
             let inside = this.checkInside(this.currentUtility[i].topRight, 
                         this.currentUtility[i].bottomLeft, 
                         [xCord,yCord]);
-                        console.log(inside);
+            if (inside) {
+                this.currentUtility[i].active = true;
+            }
+        }
+        this.setState({
+            mousePressed: true
+        });
+    }
+
+    handleMouseMove(e) {
+        if (this.state.mousePressed) {
+            for (let i = 0; i < this.currentUtility.length; i++) {
+                if (this.currentUtility[i].active) {
+                    console.log('hi');
+                }
+            }
         }
     }
 
@@ -86,6 +101,7 @@ export class CanvasShapeDragger extends React.Component {
                     ref={this.canvasRef} 
                     style={{borderStyle: 'solid'}}
                     onMouseDown={this.handleMouseDown}
+                    onMouseMove={this.handleMouseMove}
                     />
                 </div>
                 <button onClick={() => this.addUtility()}>
