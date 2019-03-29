@@ -11,8 +11,10 @@ export class CanvasShapeDragger extends React.Component {
         };
         this.currentUtility = [];
         this.canvasRef = React.createRef();
+
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.handleMouseUp = this.handleMouseUp.bind(this);
     }
 
     /* set up the canvas when it mounts by setting size*/
@@ -85,12 +87,16 @@ export class CanvasShapeDragger extends React.Component {
 
     handleMouseMove(e) {
         if (this.state.mousePressed) {
-            for (let i = 0; i < this.currentUtility.length; i++) {
-                if (this.currentUtility[i].active) {
-                    console.log('hi');
-                }
+            if (this.currentUtility[0].active) {
+                console.log('hi');
             }
         }
+    }
+
+    handleMouseUp() {
+        this.setState({
+            mousePressed: false
+        });
     }
 
     render() {
@@ -102,6 +108,7 @@ export class CanvasShapeDragger extends React.Component {
                     style={{borderStyle: 'solid'}}
                     onMouseDown={this.handleMouseDown}
                     onMouseMove={this.handleMouseMove}
+                    onMouseUp={this.handleMouseUp}
                     />
                 </div>
                 <button onClick={() => this.addUtility()}>
