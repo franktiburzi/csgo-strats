@@ -7,10 +7,11 @@ export class CanvasLineDrawer extends React.Component {
             canvas: null,
             context: null,
             mousePressed: false,
-            strokes: [],
+            strokes: [...this.props.oldStrokes],
             tempStart: [],
             tempPoints: []
         };
+        this.utilSize = 50;
         this.canvasRef = React.createRef();
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -28,8 +29,7 @@ export class CanvasLineDrawer extends React.Component {
         this.setState({
             canvas: canvas,
             context: context
-        });
-        this.props.redrawStrokes(canvas, context);
+        }, () => this.props.redrawCanvas(context, this.state.strokes, this.props.oldUtility, this.utilSize));
     }
 
     /* Draw to the canvas on initial click and record in the state
@@ -68,7 +68,7 @@ export class CanvasLineDrawer extends React.Component {
     /* Stop drawing when mouse is released*/
     handleMouseUp() {
         this.setState(prevState => ({
-                strokes: [{start: prevState.tempStart, points: prevState.tempPoints}],
+                strokes: [...prevState.strokes, {start: prevState.tempStart, points: prevState.tempPoints}],
                 mousePressed: false
         }), () => this.props.passStrokesUp(this.state.strokes));
     }

@@ -9,8 +9,9 @@ export class CanvasShapeDragger extends React.Component {
             context: null,
             mousePressed: false,
         };
-        this.currentUtility = [];
+        this.currentUtility = [...this.props.oldUtility];
         this.canvasRef = React.createRef();
+        this.utilSize = 50;
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -28,8 +29,7 @@ export class CanvasShapeDragger extends React.Component {
         this.setState({
             canvas: canvas,
             context: context
-        });
-        this.props.redrawStrokes(canvas, context);
+        }, () =>  this.props.redrawCanvas(context, this.props.oldStrokes, this.currentUtility, this.utilSize));
     }
     
     //helper to see if we clicked in a utility
@@ -45,23 +45,23 @@ export class CanvasShapeDragger extends React.Component {
 
     /*create a utility on the screen */
     addUtility() {
-        const utilSize = 50;
         let smokeImg = new Image(50,50);
         let centerX = this.state.canvas.width/2;
         let centerY = this.state.canvas.height/2;
         smokeImg.src = smokeSrc;
         smokeImg.onload = function() {
-            this.state.context.drawImage(smokeImg, centerX-utilSize/2, centerY-utilSize/2, utilSize, utilSize);
-            let topLeft = [centerX-utilSize/2,centerY-utilSize/2];
-            let topRight = [centerX+utilSize/2,centerY-utilSize/2];
-            let bottomLeft = [centerX-utilSize/2,centerY+utilSize/2];
-            let bottomRight = [centerX+utilSize/2,centerY+utilSize/2];
+            this.state.context.drawImage(smokeImg, centerX-this.utilSize/2, centerY-this.utilSize/2, this.utilSize, this.utilSize);
+            let topLeft = [centerX-this.utilSize/2,centerY-this.utilSize/2];
+            let topRight = [centerX+this.utilSize/2,centerY-this.utilSize/2];
+            let bottomLeft = [centerX-this.utilSize/2,centerY+this.utilSize/2];
+            let bottomRight = [centerX+this.utilSize/2,centerY+this.utilSize/2];
             this.currentUtility.push({
                 layer: this.currentUtility.length,
                 topLeft: topLeft,
                 topRight: topRight,
                 bottomLeft: bottomLeft,
                 bottomRight: bottomRight,
+                image: smokeImg
             });
         }.bind(this);
     }
@@ -85,18 +85,43 @@ export class CanvasShapeDragger extends React.Component {
         });
     }
 
+    /**
+     * When moving the mouse we first check if the mouse is pressed down.
+     * If pressed down then we see if any utility is active(clicked on)
+     * If moving while on top of a utility redraw the image and clear the canvas to create the dragging effect
+     * redraw everyting else on the canvas after clearing
+     */
     handleMouseMove(e) {
+        let rect = this.state.canvas.getBoundingClientRect()
+        let xCord = e.clientX - rect.left-3;
+        let yCord = e.clientY - rect.top-3;
         if (this.state.mousePressed) {
-            if (this.currentUtility[0].active) {
-                console.log('hi');
+            //when moving the mouse with mouse pressed find which util we are moving
+            for (let i = 0; i < this.currentUtility.length; i++) {
+                if (this.currentUtility[i].active) {
+                    this.currentUtility[i].topLeft = [xCord-this.utilSize/2, yCord-this.utilSize/2];
+                    this.currentUtility[i].topRight = [xCord+this.utilSize/2, yCord-this.utilSize/2];
+                    this.currentUtility[i].bottomLeft = [xCord-this.utilSize/2, yCord+this.utilSize/2];
+                    this.currentUtility[i].bottomRight = [xCord+this.utilSize/2, yCord+this.utilSize/2];
+                    this.state.context.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
+                    this.props.redrawCanvas(this.state.context, this.props.oldStrokes, this.currentUtility, this.utilSize);
+                }
             }
         }
     }
 
+    /**
+     * When mouse is released set mouse pressed to false so we dont perform anything on dragging
+     * and set that all the utility is inactive meaning we aren't clicking any
+     */
     handleMouseUp() {
         this.setState({
             mousePressed: false
         });
+        for (let i = 0; i < this.currentUtility.length; i++) {
+                this.currentUtility[i].active = false;
+        }
+        this.props.passUtilityUp(this.currentUtility);
     }
 
     render() {
