@@ -30,3 +30,37 @@
     transform: rotate(360deg);
   }
 }
+
+.yellow {
+  height: 50px;
+  width: 50px;
+  background-color: yellow;
+  border-style: solid;
+}
+
+.blue {
+  height: 50px;
+  width: 50px;
+  background-color: blue;
+  border-style: solid;
+}
+
+.green {
+  height: 50px;
+  width: 50px;
+  background-color: green;
+  border-style: solid;
+}
+
+.orange {
+  height: 50px;
+  width: 50px;
+  background-color: orange;
+  border-style: solid;
+}
+.purple {
+  height: 50px;
+  width: 50px;
+  background-color: purple;
+  border-style: solid;
+}

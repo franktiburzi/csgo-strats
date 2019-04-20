@@ -61,7 +61,8 @@ export class CanvasShapeDragger extends React.Component {
                 topRight: topRight,
                 bottomLeft: bottomLeft,
                 bottomRight: bottomRight,
-                image: smokeImg
+                image: smokeImg,
+                active: false
             });
         }.bind(this);
     }
@@ -71,13 +72,20 @@ export class CanvasShapeDragger extends React.Component {
         let rect = this.state.canvas.getBoundingClientRect()
         let xCord = e.clientX - rect.left-3;
         let yCord = e.clientY - rect.top-3;
+        let layerCheck = -1;
+        let lastActive = 0;
         //loop through all utility looking if we are inside
+        //If we there are overlapping utility we need to take the highest layer
         for (let i = 0; i < this.currentUtility.length; i++) {
             let inside = this.checkInside(this.currentUtility[i].topRight, 
                         this.currentUtility[i].bottomLeft, 
                         [xCord,yCord]);
             if (inside) {
-                this.currentUtility[i].active = true;
+                if (this.currentUtility[i].layer >= layerCheck) {
+                    this.currentUtility[lastActive].active = false;
+                    this.currentUtility[i].active = true;
+                    lastActive = layerCheck = i;
+                }
             }
         }
         this.setState({
@@ -125,20 +133,34 @@ export class CanvasShapeDragger extends React.Component {
     }
 
     render() {
+        let canvasStyle = {
+            borderStyle: 'solid',
+        };
+        let divStyle = {
+            position: 'absolute',
+            top:0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            margin: 'auto'
+        }
+
         return(
-            <div>
+            <div style={divStyle}>
                 <div>
                     <canvas 
                     ref={this.canvasRef} 
-                    style={{borderStyle: 'solid'}}
+                    style={canvasStyle}
                     onMouseDown={this.handleMouseDown}
                     onMouseMove={this.handleMouseMove}
                     onMouseUp={this.handleMouseUp}
                     />
                 </div>
-                <button onClick={() => this.addUtility()}>
-                    Add Utility
-                </button>
+                <div>
+                    <button onClick={() => this.addUtility()}>
+                        Add Utility
+                    </button>
+                </div>
             </div>
         );
     }
