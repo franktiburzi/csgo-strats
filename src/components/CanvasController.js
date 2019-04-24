@@ -82,7 +82,7 @@ export class CanvasController extends React.Component {
                                 map={this.props.map}/>
         }
         return(
-            <div style={{position:'relative'}}>
+            <div style={{position:'relative', minHeight: '620px'}}>
                 {<MapCanvas map={this.props.map}/>}
                 {canvasComponent}
             </div>

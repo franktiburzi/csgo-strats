@@ -146,8 +146,8 @@ export class CanvasShapeDragger extends React.Component {
         }
 
         return(
-            <div style={divStyle}>
-                <div>
+            <div>
+                <div style={divStyle}>
                     <canvas 
                     ref={this.canvasRef} 
                     style={canvasStyle}
@@ -156,7 +156,7 @@ export class CanvasShapeDragger extends React.Component {
                     onMouseUp={this.handleMouseUp}
                     />
                 </div>
-                <div>
+                <div style={{position: "absolute", top: "660px"}}>
                     <button onClick={() => this.addUtility()}>
                         Add Utility
                     </button>
